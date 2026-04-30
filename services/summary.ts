@@ -1,4 +1,17 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { generateWithGroq } from "./groq";
+
+async function generateWithGemini(prompt: string) {
+  const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+  if (!apiKey) throw new Error("API key not found");
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: "gemini-2.5-flash",
+  });
+  const result = await model.generateContent(prompt);
+  return await result.response.text();
+}
 
 export async function generateActivitySummary(activity: any) {
   const prompt = `
@@ -51,15 +64,13 @@ ${
 `;
 
   try {
-    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-    if (!apiKey) throw new Error("API key not found");
-
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
-    });
-    const result = await model.generateContent(prompt);
-    return await result.response.text();
+    const provider = process.env.NEXT_PUBLIC_AI_PROVIDER;
+    
+    if (provider === "groq") {
+      return await generateWithGroq(prompt);
+    } else {
+      return await generateWithGemini(prompt);
+    }
   } catch (error) {
     console.error("Error generating summary on client:", error);
     throw error;
