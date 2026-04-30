@@ -26,7 +26,7 @@ function Activities() {
   if (isError) {
     return (
       <div className="text-red-500 font-space-grotesk">
-        Failed to load activities.
+        Failed to load activities. try reconnect your strava account
       </div>
     );
   }
