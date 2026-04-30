@@ -15,7 +15,6 @@ stravaApi.interceptors.request.use(
     // getSession works on the client-side
     if (typeof window !== "undefined") {
       const session = await getSession();
-      // @ts-expect-error - accessToken is added to the session in the NextAuth callbacks
       const token = session?.accessToken;
 
       if (token) {
