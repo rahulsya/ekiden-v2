@@ -4,8 +4,7 @@ import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 
 export default function page() {
-  const { data, status } = useSession();
-  console.log(status, data);
+  const { status } = useSession();
 
   const SyncStrava = async () => {
     await signIn("strava", {
@@ -31,6 +30,7 @@ export default function page() {
       </div>
 
       <div className="mt-4">
+        {status == "loading" && <div className="text-white">Loading...</div>}
         {status == "authenticated" ? (
           <>
             <div className="rounded-[16px] flex p-[20px] items-start bg- gap-2 mt-8 cursor-pointer border border-lime-primary">
@@ -67,18 +67,22 @@ export default function page() {
           </div>
         )}
 
-        <div className="font-space-grotesk font-bold sm mt-8">
-          Reconnect to Strava
-        </div>
-        <div className="text-sm text-white-60">
-          Reconnect if you got problem with your data.
-        </div>
-        <button
-          onClick={SyncStrava}
-          className="mt-4 px-4 py-2 bg-lime-primary text-black font-bold rounded-full cursor-pointer"
-        >
-          Reconnect to Strava
-        </button>
+        {status !== "loading" && status === "authenticated" && (
+          <div>
+            <div className="font-space-grotesk font-bold sm mt-8">
+              Reconnect to Strava
+            </div>
+            <div className="text-sm text-white-60">
+              Reconnect if you got problem with your data.
+            </div>
+            <button
+              onClick={SyncStrava}
+              className="mt-4 px-4 py-2 bg-lime-primary text-black font-bold rounded-full cursor-pointer"
+            >
+              Reconnect to Strava
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
