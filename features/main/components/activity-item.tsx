@@ -60,28 +60,53 @@ function ActivityItem({ activity }: { activity?: any }) {
         </div>
       </div>
 
-      <div className="flex flex-row gap-4 pt-[24px] text-[10px]">
-        <div className="flex flex-col font-space-grotesk text-white-60 min-w-[80px]">
-          <div>DISTANCE</div>
-          <div className="text-[18px] text-white font-lexend">
-            {formatDistance(activity.distance)}{" "}
-            <span className="text-white-60 text-xs">km</span>
+      {activity.type === "WeightTraining" || activity.sport_type === "WeightTraining" ? (
+        <div className="flex flex-row gap-4 pt-[24px] text-[10px]">
+          <div className="flex flex-col font-space-grotesk text-white-60 min-w-[80px]">
+            <div>TIME</div>
+            <div className="text-[18px] text-white font-lexend">
+              {formatTime(activity.moving_time)}
+            </div>
+          </div>
+          <div className="flex flex-col font-space-grotesk text-white-60 min-w-[80px]">
+            <div>AVG HR</div>
+            <div className="text-[18px] text-white font-lexend">
+              {activity.average_heartrate ? Math.round(activity.average_heartrate) : "--"}{" "}
+              <span className="text-white-60 text-xs">bpm</span>
+            </div>
+          </div>
+          <div className="flex flex-col font-space-grotesk text-white-60">
+            <div>CALORIES</div>
+            <div className="text-[18px] text-white font-lexend">
+              {activity.calories ? Math.round(activity.calories) : "--"}{" "}
+              <span className="text-white-60 text-xs">kcal</span>
+            </div>
           </div>
         </div>
-        <div className="flex flex-col font-space-grotesk text-white-60 min-w-[80px]">
-          <div>PACE</div>
-          <div className="text-[18px] text-white font-lexend">
-            {formatPace(activity.average_speed)}{" "}
-            <span className="text-white-60 text-xs">/km</span>
+      ) : (
+        <div className="flex flex-row gap-4 pt-[24px] text-[10px]">
+          <div className="flex flex-col font-space-grotesk text-white-60 min-w-[80px]">
+            <div>DISTANCE</div>
+            <div className="text-[18px] text-white font-lexend">
+              {formatDistance(activity.distance)}{" "}
+              <span className="text-white-60 text-xs">km</span>
+            </div>
+          </div>
+          <div className="flex flex-col font-space-grotesk text-white-60 min-w-[80px]">
+            <div>PACE</div>
+            <div className="text-[18px] text-white font-lexend">
+              {formatPace(activity.average_speed)}{" "}
+              <span className="text-white-60 text-xs">/km</span>
+            </div>
+          </div>
+          <div className="flex flex-col font-space-grotesk text-white-60">
+            <div>TIME</div>
+            <div className="text-[18px] text-white font-lexend">
+              {formatTime(activity.moving_time)}
+            </div>
           </div>
         </div>
-        <div className="flex flex-col font-space-grotesk text-white-60">
-          <div>TIME</div>
-          <div className="text-[18px] text-white font-lexend">
-            {formatTime(activity.moving_time)}
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

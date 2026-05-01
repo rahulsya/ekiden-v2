@@ -9,6 +9,7 @@ export const authOptions: AuthOptions = {
       authorization: {
         params: {
           scope: "activity:read_all",
+          // redirect_uri: "http://localhost:3000",
         },
       },
     }),
