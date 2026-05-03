@@ -15,6 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import { stravaService } from "@/services/strava";
 import { useActivityFormat } from "@/hooks/use-activity-format";
 import { generateActivitySummary } from "@/services/summary";
+import { ActivityMap } from "@/features/main/components/activity-map";
 
 export default function ActivityDetail({
   params,
@@ -83,12 +84,21 @@ export default function ActivityDetail({
   }
 
   return (
-    <div className="flex flex-col h-full p-[32px] bg-[#111317] overflow-y-auto">
-      <div className="flex flex-row justify-between pb-8">
+    <div className="flex flex-col min-h-screen p-[32px] bg-[#111317] overflow-y-auto">
+      <div className="flex flex-row justify-between pb-4">
         <Link href="/">
           <ArrowLeft className="text-white" />
         </Link>
       </div>
+      {activity.map?.polyline || activity.map?.summary_polyline ? (
+        <>
+          <div className="w-full h-[300px]">
+            <ActivityMap polyline={activity.map.polyline || activity.map.summary_polyline} />
+          </div>
+          <div className="mt-[10px]"></div>
+        </>
+      ) : null}
+
       <div className="font-space-grotesk font-bold text-[10px] text-lime-primary uppercase">
         {formatDate(activity.start_date, activity.timezone)} •{" "}
         {formatTimeOfDay(activity.start_date, activity.timezone)}
@@ -97,7 +107,8 @@ export default function ActivityDetail({
         {activity.name}
       </div>
       <div className="mt-[10px]"></div>
-      {activity.type === "WeightTraining" || activity.sport_type === "WeightTraining" ? (
+      {activity.type === "WeightTraining" ||
+      activity.sport_type === "WeightTraining" ? (
         <div className="flex flex-row justify-between gap-4 py-[24px] border-t border-b border-[#444933] text-[10px]">
           <div className="flex flex-col font-space-grotesk text-white-60 min-w-[80px]">
             <div>TIME</div>
@@ -108,7 +119,9 @@ export default function ActivityDetail({
           <div className="flex flex-col font-space-grotesk text-white-60 min-w-[80px]">
             <div>AVG HR</div>
             <div className="text-[30px] font-bold text-white font-lexend">
-              {activity.average_heartrate ? Math.round(activity.average_heartrate) : "--"}{" "}
+              {activity.average_heartrate
+                ? Math.round(activity.average_heartrate)
+                : "--"}{" "}
               <span className="text-white-60 text-sm font-normal">bpm</span>
             </div>
           </div>
