@@ -33,8 +33,17 @@ export const ActivityMap: React.FC<ActivityMapProps> = ({ polyline, className })
   useEffect(() => {
     if (!polyline || dimensions.width === 0 || dimensions.height === 0 || !canvasRef.current) return;
 
-    const ctx = canvasRef.current.getContext("2d");
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
+
+    // Handle Device Pixel Ratio for sharp rendering
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = dimensions.width * dpr;
+    canvas.height = dimensions.height * dpr;
+    
+    // Normalize coordinate system to use css pixels
+    ctx.scale(dpr, dpr);
 
     // Decode polyline [lat, lng]
     const path = decode(polyline, 5);
