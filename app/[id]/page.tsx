@@ -140,7 +140,6 @@ export default function ActivityDetail({
             />
           </div>
           <div className="mt-[10px]"></div>
-          <button onClick={handleGetImage}>get image</button>
         </>
       ) : null}
 
@@ -309,7 +308,7 @@ export default function ActivityDetail({
         leaveFrom={"translate-y-0 opacity-100"}
         leaveTo={"translate-y-full opacity-0"}
       >
-        <div className="h-[calc(100vh-300px)] w-full absolute bottom-0 left-0 px-4 shadow-lg">
+        <div className="h-auto w-full absolute bottom-0 left-0 px-4 shadow-lg">
           <div className="w-full bg-[#1A1C1F] h-full rounded-t-lg p-4 flex flex-col">
             <div className="flex justify-between items-center">
               <div className="font-lexend font-bold text-lg text-white">
