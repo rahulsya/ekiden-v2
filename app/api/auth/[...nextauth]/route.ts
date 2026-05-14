@@ -1,3 +1,4 @@
+import { stravaService } from "@/services/strava";
 import NextAuth, { AuthOptions } from "next-auth";
 import StravaProvider from "next-auth/providers/strava";
 
@@ -16,16 +17,33 @@ export const authOptions: AuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account }) {
-      console.log("account", account);
+      // console.log("account", account);
       return true;
     },
     async jwt({ token, account }) {
       // Store the access token in the JWT so it can be used for API requests
-      console.log("account jwt", account);
+
       if (account) {
         token.user = account.athlete;
         token.accessToken = account.access_token;
+        token.refreshToken = account.refresh_token;
+        token.expires_at = account.expires_at;
       }
+
+      const currentTime = Math.floor(Date.now() / 1000);
+
+      if (token.expires_at && token.expires_at < currentTime) {
+        const data = await stravaService.refreshToken(token.refreshToken!);
+        if (data) {
+          token.accessToken = data.access_token;
+          token.refreshToken = data.refresh_token;
+          token.expires_at = data.expires_at;
+          token.error = null;
+        } else {
+          token.error = "RefreshAccessTokenError";
+        }
+      }
+
       return token;
     },
     async session({ session, token }) {
