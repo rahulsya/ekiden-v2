@@ -28,6 +28,7 @@ export const authOptions: AuthOptions = {
         token.accessToken = account.access_token;
         token.refreshToken = account.refresh_token;
         token.expires_at = account.expires_at;
+        token.error = null;
       }
 
       const currentTime = Math.floor(Date.now() / 1000);
@@ -48,8 +49,10 @@ export const authOptions: AuthOptions = {
     },
     async session({ session, token }) {
       // Pass the access token to the client-side session
+      // console.log("token", token);
       session.user = token.user as any;
       session.accessToken = token.accessToken as string;
+      session.error = token.error as string;
       return session;
     },
   },
