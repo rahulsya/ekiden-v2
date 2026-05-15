@@ -103,7 +103,10 @@ function buildRunningPrompt(activity: any): string {
 
   const hrZoneSummary = hrZones
     ? Object.entries(hrZones)
-        .map(([z, n]) => `${z}:${Math.round((n / laps.length) * 100)}%`)
+        .map(
+          ([z, n]: [any, any]) =>
+            `${z}:${Math.round((n / laps.length) * 100)}%`,
+        )
         .join(" ")
     : null;
 
