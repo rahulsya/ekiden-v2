@@ -28,51 +28,110 @@ function formatPace(speed: number): string {
   return `${min}:${sec} min/km`;
 }
 
+// function buildRunningPrompt(activity: any): string {
+//   return `
+// You are a professional running coach and sports analyst.
+// Analyze the following Strava running activity data and generate
+// a concise, motivating performance summary in 2-3 sentences.
+
+// The summary MUST include:
+// - Consistency observation (based on splits pace/speed variation)
+// - Heart rate zone analysis (Zone 1 <120bpm, Zone 2 120-140bpm,
+//   Zone 3 140-160bpm, Zone 4 160-175bpm, Zone 5 >175bpm) — calculate % of laps in each zone
+// - Cadence consistency observation across elevation changes
+// - Tone: encouraging, coach-like, data-driven
+
+// Output format: Plain paragraph, no bullet points, no markdown.
+// Maximum 3 sentences. Start directly with the insight.
+
+// Activity Data:
+// - Distance: ${(activity.distance / 1000).toFixed(2)} km
+// - Moving Time: ${formatDuration(activity.moving_time)}
+// - Average Pace: ${formatPace(activity.average_speed)}
+// - Average Heart Rate: ${activity.average_heartrate || "--"} bpm
+// - Max Heart Rate: ${activity.max_heartrate || "--"} bpm
+// - Average Cadence: ${activity.average_cadence || "--"} spm
+// - Total Elevation Gain: ${activity.total_elevation_gain || 0} m
+
+// Lap Data:
+// ${
+//   activity.laps
+//     ?.map(
+//       (lap: any) =>
+//         `Lap ${lap.lap_index}: HR ${lap.average_heartrate || "--"} bpm, Cadence ${lap.average_cadence || "--"} spm, Elevation gain ${lap.total_elevation_gain || 0}m`,
+//     )
+//     .join("\n") || "No lap data available."
+// }
+
+// Splits (avg speed per km):
+// ${
+//   activity.splits_metric
+//     ?.slice(0, 10)
+//     .map(
+//       (s: any) =>
+//         `Split ${s.split}: ${formatPace(s.average_speed)}, HR ${Math.round(s.average_heartrate || 0)} bpm`,
+//     )
+//     .join("\n") || "No split data available."
+// }`;
+// }
+
 function buildRunningPrompt(activity: any): string {
-  return `
-You are a professional running coach and sports analyst.
-Analyze the following Strava running activity data and generate
-a concise, motivating performance summary in 2-3 sentences.
+  const laps = activity.laps ?? [];
+  const splits = activity.splits_metric?.slice(0, 10) ?? [];
 
-The summary MUST include:
-- Consistency observation (based on splits pace/speed variation)
-- Heart rate zone analysis (Zone 1 <120bpm, Zone 2 120-140bpm, 
-  Zone 3 140-160bpm, Zone 4 160-175bpm, Zone 5 >175bpm) — calculate % of laps in each zone
-- Cadence consistency observation across elevation changes
-- Tone: encouraging, coach-like, data-driven
+  // Pre-compute heart rate zones
+  const hrZones = laps.length
+    ? laps.reduce(
+        (acc: Record<string, number>, lap: any) => {
+          const hr = lap.average_heartrate ?? 0;
+          const zone =
+            hr < 120
+              ? "Z1"
+              : hr < 140
+                ? "Z2"
+                : hr < 160
+                  ? "Z3"
+                  : hr < 175
+                    ? "Z4"
+                    : "Z5";
+          acc[zone] = (acc[zone] ?? 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>,
+      )
+    : null;
 
-Output format: Plain paragraph, no bullet points, no markdown.
-Maximum 3 sentences. Start directly with the insight.
+  const hrZoneSummary = hrZones
+    ? Object.entries(hrZones)
+        .map(([z, n]) => `${z}:${Math.round((n / laps.length) * 100)}%`)
+        .join(" ")
+    : null;
 
-Activity Data:
-- Distance: ${(activity.distance / 1000).toFixed(2)} km
-- Moving Time: ${formatDuration(activity.moving_time)}
-- Average Pace: ${formatPace(activity.average_speed)}
-- Average Heart Rate: ${activity.average_heartrate || "--"} bpm
-- Max Heart Rate: ${activity.max_heartrate || "--"} bpm
-- Average Cadence: ${activity.average_cadence || "--"} spm
-- Total Elevation Gain: ${activity.total_elevation_gain || 0} m
+  // Pre-compute pace consistency (std deviation of splits)
+  const speeds = splits.map((s: any) => s.average_speed).filter(Boolean);
+  const avgSpeed =
+    speeds.reduce((a: number, b: number) => a + b, 0) / (speeds.length || 1);
+  const paceVariation =
+    speeds.length > 1
+      ? Math.round(
+          (Math.sqrt(
+            speeds.reduce(
+              (a: number, b: number) => a + (b - avgSpeed) ** 2,
+              0,
+            ) / speeds.length,
+          ) /
+            avgSpeed) *
+            100,
+        )
+      : null;
 
-Lap Data:
-${
-  activity.laps
-    ?.map(
-      (lap: any) =>
-        `Lap ${lap.lap_index}: HR ${lap.average_heartrate || "--"} bpm, Cadence ${lap.average_cadence || "--"} spm, Elevation gain ${lap.total_elevation_gain || 0}m`,
-    )
-    .join("\n") || "No lap data available."
-}
+  return `You are a running coach. Write ONE paragraph (max 3 sentences) analyzing this run. Be direct, data-driven, and encouraging. No markdown, no lists.
 
-Splits (avg speed per km):
-${
-  activity.splits_metric
-    ?.slice(0, 10)
-    .map(
-      (s: any) =>
-        `Split ${s.split}: ${formatPace(s.average_speed)}, HR ${Math.round(s.average_heartrate || 0)} bpm`,
-    )
-    .join("\n") || "No split data available."
-}`;
+Cover in order: (1) pace consistency using ${paceVariation !== null ? `${paceVariation}% speed variation` : "split data"}, (2) HR zones ${hrZoneSummary ?? `avg ${activity.average_heartrate ?? "--"} bpm`}, (3) one actionable coaching cue.
+
+Run: ${(activity.distance / 1000).toFixed(2)}km in ${formatDuration(activity.moving_time)} @ ${formatPace(activity.average_speed)}/km | Cadence: ${activity.average_cadence ?? "--"} spm | Elevation: +${activity.total_elevation_gain ?? 0}m
+Splits: ${splits.map((s: any) => `${formatPace(s.average_speed)}`).join(" · ") || "n/a"}
+HR: avg ${activity.average_heartrate ?? "--"} max ${activity.max_heartrate ?? "--"} bpm${hrZoneSummary ? ` | Zones: ${hrZoneSummary}` : ""}`;
 }
 
 function buildWeightTrainingPrompt(activity: any): string {

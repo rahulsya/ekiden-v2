@@ -12,6 +12,7 @@ import { decode } from "@googlemaps/polyline-codec";
 interface ActivityMapProps {
   polyline?: string;
   className?: string;
+  lineColor?: string;
 }
 
 export interface ActivityMapRef {
@@ -19,7 +20,7 @@ export interface ActivityMapRef {
 }
 
 export const ActivityMap = forwardRef<ActivityMapRef, ActivityMapProps>(
-  ({ polyline, className }, ref) => {
+  ({ polyline, className, lineColor = "#C3F400" }, ref) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -108,7 +109,7 @@ export const ActivityMap = forwardRef<ActivityMapRef, ActivityMapProps>(
 
       // Draw the path
       ctx.beginPath();
-      ctx.strokeStyle = "#C3F400"; // Lime Primary
+      ctx.strokeStyle = lineColor; // Lime Primary
       ctx.lineWidth = 3;
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
@@ -126,7 +127,7 @@ export const ActivityMap = forwardRef<ActivityMapRef, ActivityMapProps>(
       });
 
       ctx.stroke();
-    }, [polyline, dimensions]);
+    }, [polyline, dimensions, lineColor]);
 
     if (!polyline) return null;
 
