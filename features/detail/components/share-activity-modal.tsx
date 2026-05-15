@@ -2,9 +2,8 @@ import { Fragment, useRef, useState } from "react";
 import { Transition } from "@headlessui/react";
 import { CircleX } from "lucide-react";
 import { toPng } from "html-to-image";
-import { ActivityMap } from "./activity-map";
-import { ActivityStat } from "./activity-stat";
-import { useActivityFormat } from "@/hooks/use-activity-format";
+import { ShareStyle1 } from "./share-style-1";
+import { ShareStyle2 } from "./share-style-2";
 
 interface ShareActivityModalProps {
   show: boolean;
@@ -20,8 +19,6 @@ export function ShareActivityModal({
   const shareImgRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(false);
   const [style, setStyle] = useState<"style1" | "style2">("style1");
-
-  const { formatDistance, formatPace, formatTime } = useActivityFormat();
 
   const downloadImage = () => {
     if (shareImgRef.current) {
@@ -98,75 +95,8 @@ export function ShareActivityModal({
             ref={shareImgRef}
             className="relative flex flex-col p-2 rounded-lg"
           >
-            {style === "style1" && (
-              <>
-                {activity.map?.polyline || activity.map?.summary_polyline ? (
-                  <div className="w-full h-[300px]">
-                    <ActivityMap
-                      polyline={
-                        activity.map.polyline || activity.map.summary_polyline
-                      }
-                      lineColor="#fff"
-                    />
-                  </div>
-                ) : null}
-
-                <div className="flex flex-row justify-between gap-4 py-[8px] border-[#444933] text-[10px]">
-                  <ActivityStat
-                    className="min-w-[80px]"
-                    label="DISTANCE"
-                    labelClassName="font-medium text-[12px] text-white"
-                    value={formatDistance(activity.distance)}
-                    unit="km"
-                  />
-                  <ActivityStat
-                    className="min-w-[80px]"
-                    label="PACE"
-                    labelClassName="font-medium text-[12px] text-white"
-                    value={formatPace(activity.average_speed)}
-                    unit="/km"
-                  />
-                  <ActivityStat
-                    label="TIME"
-                    labelClassName="font-medium text-[12px] text-white"
-                    value={formatTime(activity.moving_time)}
-                  />
-                </div>
-                <div className="flex flex-row justify-between gap-4 py-[8px] border-[#444933] text-[10px]">
-                  <ActivityStat
-                    className="min-w-[80px]"
-                    label="HEART RATE"
-                    labelClassName="font-medium text-[12px] text-white"
-                    value={activity.average_heartrate || "--"}
-                    unit="bpm"
-                  />
-                  <ActivityStat
-                    className="min-w-[80px]"
-                    label="ELEVATION"
-                    labelClassName="font-medium text-[12px] text-white"
-                    value={activity.total_elevation_gain}
-                    unit="m"
-                  />
-                  <ActivityStat
-                    label="CALORIES"
-                    labelClassName="font-medium text-[12px] text-white"
-                    value={activity.calories || "--"}
-                    unit="kcal"
-                  />
-                </div>
-              </>
-            )}
-
-            {style === "style2" && (
-              <div className="flex flex-col items-center justify-center py-10 bg-black/20 rounded-xl">
-                <div className="text-white text-lg font-space-grotesk opacity-50">
-                  Style 2 Placeholder
-                </div>
-                <div className="text-white-60 text-sm mt-2">
-                  Add more styles here!
-                </div>
-              </div>
-            )}
+            {style === "style1" && <ShareStyle1 activity={activity} />}
+            {style === "style2" && <ShareStyle2 activity={activity} />}
           </div>
 
           <button

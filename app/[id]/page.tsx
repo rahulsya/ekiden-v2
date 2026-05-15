@@ -16,9 +16,9 @@ import { useQuery } from "@tanstack/react-query";
 import { stravaService } from "@/services/strava";
 import { useActivityFormat } from "@/hooks/use-activity-format";
 import { generateActivitySummary } from "@/services/summary";
-import { ActivityMap } from "@/features/main/components/activity-map";
-import { ActivityStat } from "@/features/main/components/activity-stat";
-import { ShareActivityModal } from "@/features/main/components/share-activity-modal";
+import { ActivityMap } from "@/components/commons/activity-map";
+import { ActivityStat } from "@/components/commons/activity-stat";
+import { ShareActivityModal } from "@/features/detail/components/share-activity-modal";
 
 export default function ActivityDetail({
   params,
