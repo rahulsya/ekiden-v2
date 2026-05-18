@@ -2,7 +2,13 @@ import { useActivityFormat } from "@/hooks/use-activity-format";
 import { ActivityMap } from "../../../components/commons/activity-map";
 import { ActivityStat } from "../../../components/commons/activity-stat";
 
-export function ShareStyle1({ activity }: { activity: any }) {
+export function ShareStyle1({
+  activity,
+  lineColor = "#fff",
+}: {
+  activity: any;
+  lineColor?: string;
+}) {
   const { formatDistance, formatPace, formatTime } = useActivityFormat();
 
   return (
@@ -11,7 +17,7 @@ export function ShareStyle1({ activity }: { activity: any }) {
         <div className="w-full h-[300px]">
           <ActivityMap
             polyline={activity.map.polyline || activity.map.summary_polyline}
-            lineColor="#fff"
+            lineColor={lineColor}
           />
         </div>
       ) : null}

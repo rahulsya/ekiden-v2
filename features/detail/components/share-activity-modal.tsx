@@ -11,6 +11,17 @@ interface ShareActivityModalProps {
   activity: any;
 }
 
+const colors = [
+  { label: "White", value: "#fff" },
+  { label: "Lime", value: "#C3F400" },
+  { label: "Red", value: "#FF0000" },
+  { label: "Orange", value: "#FF8200" },
+  { label: "Blue", value: "#1D39FF" },
+  { label: "Purple", value: "#633AFF" },
+  { label: "Pink", value: "#FF008A" },
+  { label: "Yellow", value: "#D9D901" },
+];
+
 export function ShareActivityModal({
   show,
   onClose,
@@ -19,6 +30,7 @@ export function ShareActivityModal({
   const shareImgRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(false);
   const [style, setStyle] = useState<"style1" | "style2">("style1");
+  const [color, setColor] = useState<string>("#fff");
 
   const downloadImage = () => {
     if (shareImgRef.current) {
@@ -90,12 +102,29 @@ export function ShareActivityModal({
               Style 2
             </button>
           </div>
-
+          {style === "style1" && (
+            <div className="flex gap-2">
+              {colors.map((item, index) => (
+                <button
+                  key={index}
+                  onClick={() => setColor(item.value)}
+                  className={`cursor-pointer rounded-sm transition-colors`}
+                >
+                  <div
+                    className="w-6 h-6 rounded-full"
+                    style={{ background: item.value }}
+                  />
+                </button>
+              ))}
+            </div>
+          )}
           <div
             ref={shareImgRef}
             className="relative flex flex-col p-2 rounded-lg"
           >
-            {style === "style1" && <ShareStyle1 activity={activity} />}
+            {style === "style1" && (
+              <ShareStyle1 activity={activity} lineColor={color} />
+            )}
             {style === "style2" && <ShareStyle2 activity={activity} />}
           </div>
 
