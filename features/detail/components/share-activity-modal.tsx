@@ -4,6 +4,7 @@ import { CircleX } from "lucide-react";
 import { toPng } from "html-to-image";
 import { ShareStyle1 } from "./share-style-1";
 import { ShareStyle2 } from "./share-style-2";
+import { ShareStyle3 } from "./share-style-3";
 
 interface ShareActivityModalProps {
   show: boolean;
@@ -29,7 +30,7 @@ export function ShareActivityModal({
 }: ShareActivityModalProps) {
   const shareImgRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(false);
-  const [style, setStyle] = useState<"style1" | "style2">("style1");
+  const [style, setStyle] = useState<"style1" | "style2" | "style3">("style1");
   const [color, setColor] = useState<string>("#fff");
 
   const downloadImage = () => {
@@ -81,26 +82,19 @@ export function ShareActivityModal({
             </button>
           </div>
           <div className="flex gap-2 text-sm py-4">
-            <button
-              onClick={() => setStyle("style1")}
-              className={`cursor-pointer rounded-full text-xs px-3 py-1 flex items-center justify-center transition-colors ${
-                style === "style1"
-                  ? "bg-lime-primary text-black font-bold"
-                  : "bg-gray-500 text-white"
-              }`}
-            >
-              Style 1
-            </button>
-            <button
-              onClick={() => setStyle("style2")}
-              className={`cursor-pointer rounded-full text-xs px-3 py-1 flex items-center justify-center transition-colors ${
-                style === "style2"
-                  ? "bg-lime-primary text-black font-bold"
-                  : "bg-gray-500 text-white"
-              }`}
-            >
-              Style 2
-            </button>
+            {(["style1", "style2", "style3"] as const).map((s, index) => (
+              <button
+                key={s}
+                onClick={() => setStyle(s)}
+                className={`cursor-pointer rounded-full text-xs px-3 py-1 flex items-center justify-center transition-colors ${
+                  style === s
+                    ? "bg-lime-primary text-black font-bold"
+                    : "bg-gray-500 text-white"
+                }`}
+              >
+                Style {index + 1}
+              </button>
+            ))}
           </div>
           {style === "style1" && (
             <div className="flex gap-2">
@@ -126,6 +120,7 @@ export function ShareActivityModal({
               <ShareStyle1 activity={activity} lineColor={color} />
             )}
             {style === "style2" && <ShareStyle2 activity={activity} />}
+            {style === "style3" && <ShareStyle3 activity={activity} />}
           </div>
 
           <button

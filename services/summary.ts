@@ -87,7 +87,7 @@ function buildRunningPrompt(activity: any): string {
           const zone =
             hr < 120
               ? "Z1"
-              : hr < 140
+              : hr < 155
                 ? "Z2"
                 : hr < 160
                   ? "Z3"
